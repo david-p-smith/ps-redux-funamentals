@@ -1,11 +1,37 @@
 import React from 'react';
+import { createStore } from 'redux';
 import PropTypes from 'prop-types'
 import axios from 'axios';
 import debounce from 'lodash.debounce';
 
+var defaultState = {
+    originAmount: '0.00'
+};
+
+function amount(state = defaultState, action) {
+    if (action.type === 'CHANGE_ORIGIN_AMOUNT') {
+        return {
+            ...state,
+            originAmount: action.data
+        }
+    }
+
+    return state;
+}
+
+var store = createStore(amount);
+
+store.subscribe(function () {
+    console.log('state', store.getState());
+});
+
+store.dispatch({ type: 'CHANGE_ORIGIN_AMOUNT', data: '300.65' });
+store.dispatch({ type: '' });
+store.dispatch({ type: '' });
+
 class FeesTable extends React.Component {
     render() {
-        var {conversionRate, fee, total, originCurrency, destinationCurrency} = this.props;
+        var { conversionRate, fee, total, originCurrency, destinationCurrency } = this.props;
 
         return (
             <div>
@@ -134,10 +160,10 @@ class Conversion extends React.Component {
         var newAmount = event.target.value;
 
         // remove unallowed chars
-        newAmount = newAmount.replace(',','')
+        newAmount = newAmount.replace(',', '')
 
         // optimistic field updates
-        this.setState({originAmount: newAmount});
+        this.setState({ originAmount: newAmount });
 
         // get the new dest amount
         this.makeConversionAjaxCall({
@@ -173,9 +199,9 @@ class Conversion extends React.Component {
         var newAmount = event.target.value;
 
         // remove unallowed chars
-        newAmount = newAmount.replace(',','')
+        newAmount = newAmount.replace(',', '')
         // optimistic update
-        this.setState({destinationAmount: newAmount})
+        this.setState({ destinationAmount: newAmount })
 
         this.makeConversionAjaxCall({
             currentlyEditing: 'dest',
@@ -229,10 +255,10 @@ class Conversion extends React.Component {
         axios.get('/api/conversion', {
             params: payload
         })
-        .then((resp) => {
-            successCallback(resp.data);
-        })
-        .catch(failureCallback);
+            .then((resp) => {
+                successCallback(resp.data);
+            })
+            .catch(failureCallback);
 
     }
     // this is debounced in `componentDidMount()`
@@ -240,10 +266,10 @@ class Conversion extends React.Component {
         axios.get('/api/fees', {
             params: payload
         })
-        .then((resp) => {
-            successCallback(resp.data);
-        })
-        .catch(failureCallback);
+            .then((resp) => {
+                successCallback(resp.data);
+            })
+            .catch(failureCallback);
     }
     calcNewTotal() {
         var newTotal = parseFloat(this.state.originAmount, 10) + parseFloat(this.state.feeAmount, 10);
@@ -274,7 +300,7 @@ class Conversion extends React.Component {
                 </select>
 
 
-                <br/><br/><br/>
+                <br /><br /><br />
                 <FeesTable
                     originCurrency={this.state.originCurrency}
                     destinationCurrency={this.state.destinationCurrency}
